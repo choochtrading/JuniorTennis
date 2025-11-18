@@ -142,7 +142,9 @@ def predict_match():
             'player2_win_probability': result['player2_win_probability'],
             'predicted_winner': result['predicted_winner'],
             'confidence': result['confidence'],
-            'h2h': h2h
+            'h2h': h2h,
+            'player1_odds': result['player1_odds'],
+            'player2_odds': result['player2_odds']
         })
         
     except Exception as e:
@@ -156,4 +158,5 @@ if __name__ == '__main__':
     print("Open your browser and navigate to: http://127.0.0.1:5000")
     print("="*70 + "\n")
     app.run(debug=True, host='0.0.0.0', port=5000)
+
 

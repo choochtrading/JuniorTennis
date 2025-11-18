@@ -206,6 +206,11 @@ class InteractivePredictor:
         print("-"*70)
         print(f"\nPredicted Winner: {result['predicted_winner']}")
         print(f"Confidence Level: {result['confidence']:.1%}")
+        print("\n" + "-"*70)
+        print("PREDICTED BETTING ODDS")
+        print("-"*70)
+        print(f"{player1_name:30s} Decimal: {result['player1_odds']['decimal']:>6.2f} | American: {result['player1_odds']['american']:>+6d} | Fractional: {result['player1_odds']['fractional']:>8s}")
+        print(f"{player2_name:30s} Decimal: {result['player2_odds']['decimal']:>6.2f} | American: {result['player2_odds']['american']:>+6d} | Fractional: {result['player2_odds']['fractional']:>8s}")
         print("="*70 + "\n")
         
         return result
@@ -287,5 +292,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 

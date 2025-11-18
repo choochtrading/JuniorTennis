@@ -120,8 +120,10 @@ class TennisPredictionModel:
         """
         print("Engineering features...")
         
-        # Rank difference (normalized)
-        df['rank_diff_normalized'] = (df['player2_rank'] - df['player1_rank']) / 500
+        # Rank difference (using inverse rank to give more weight to top players)
+        # Lower rank = better, so we use 1/rank to make small differences at top more significant
+        df['rank_diff_normalized'] = (1.0 / df['player1_rank'] - 1.0 / df['player2_rank']) * 10
+        # Scale by 10 to make it comparable to other features
         
         # Win rate difference
         df['win_rate_diff'] = df['player1_win_rate'] - df['player2_win_rate']
@@ -134,8 +136,10 @@ class TennisPredictionModel:
         df['h2h_advantage'] = (df['player1_h2h_wins'] / df['h2h_meetings'].replace(0, 1)) - 0.5
         df['h2h_advantage'] = df['h2h_advantage'].fillna(0)
         
-        # Age difference (normalized)
+        # Age difference (normalized and transformed to reduce impact of extreme differences)
         df['age_diff'] = (df['player2_age'] - df['player1_age']) / 20
+        # Use tanh to compress extreme values and reduce their impact
+        df['age_diff'] = np.tanh(df['age_diff'] * 0.5)  # Scale by 0.5 to reduce sensitivity
         
         # Surface encoding
         df['surface_hard'] = (df['surface'] == 'Hard').astype(int)
@@ -147,8 +151,10 @@ class TennisPredictionModel:
         df['player2_strength'] = (500 - df['player2_rank']) / 500 + df['player2_win_rate'] + df['player2_recent_form']
         df['strength_diff'] = df['player1_strength'] - df['player2_strength']
         
-        # Experience factor (older players might have more experience)
+        # Experience factor (older players might have more experience, also transformed)
         df['experience_diff'] = (df['player1_age'] - df['player2_age']) / 20
+        # Use tanh to compress extreme values and reduce their impact
+        df['experience_diff'] = np.tanh(df['experience_diff'] * 0.5)  # Scale by 0.5 to reduce sensitivity
         
         return df
     
@@ -241,6 +247,67 @@ class TennisPredictionModel:
         
         return accuracy, X_test, y_test, y_pred, y_pred_proba
     
+    def calculate_betting_odds(self, probability, margin=0.05):
+        """
+        Calculate betting odds from win probability.
+        
+        Parameters:
+        -----------
+        probability : float
+            Win probability (0.0 to 1.0)
+        margin : float
+            Bookmaker margin/overround (default 5%)
+        
+        Returns:
+        --------
+        dict : Dictionary with different odds formats
+            - decimal: Decimal odds (European format)
+            - american: American odds (US format, negative for favorites)
+            - fractional: Fractional odds (UK format as string)
+        """
+        # Apply margin to create overround
+        # Adjusted probability = probability / (1 + margin)
+        adjusted_prob = probability / (1 + margin)
+        
+        # Ensure probability is within valid range
+        adjusted_prob = max(0.01, min(0.99, adjusted_prob))
+        
+        # Decimal odds (European format)
+        decimal_odds = 1.0 / adjusted_prob
+        
+        # American odds (US format)
+        if adjusted_prob >= 0.5:
+            # Favorite (negative odds)
+            american_odds = -100 * adjusted_prob / (1 - adjusted_prob)
+        else:
+            # Underdog (positive odds)
+            american_odds = 100 * (1 - adjusted_prob) / adjusted_prob
+        
+        # Fractional odds (UK format)
+        numerator = (1 - adjusted_prob) * 100
+        denominator = adjusted_prob * 100
+        
+        # Simplify fraction (find GCD)
+        from math import gcd
+        divisor = gcd(int(numerator * 100), int(denominator * 100))
+        if divisor > 0:
+            num = int(numerator * 100 / divisor)
+            den = int(denominator * 100 / divisor)
+            # Round to reasonable values
+            if num > 100 or den > 100:
+                num = round(numerator)
+                den = round(denominator)
+            fractional_odds = f"{num}/{den}"
+        else:
+            fractional_odds = f"{round(numerator)}/{round(denominator)}"
+        
+        return {
+            'decimal': round(decimal_odds, 2),
+            'american': int(round(american_odds)),
+            'fractional': fractional_odds,
+            'implied_probability': round(adjusted_prob, 4)
+        }
+    
     def predict_match(self, player1_stats, player2_stats, surface='Hard'):
         """
         Predict the outcome of a single match.
@@ -263,7 +330,8 @@ class TennisPredictionModel:
             raise ValueError("Model must be trained before making predictions!")
         
         # Calculate features
-        rank_diff_normalized = (player2_stats['rank'] - player1_stats['rank']) / 500
+        # Use inverse rank to give more weight to small rank differences at the top
+        rank_diff_normalized = (1.0 / player1_stats['rank'] - 1.0 / player2_stats['rank']) * 10
         win_rate_diff = player1_stats['win_rate'] - player2_stats['win_rate']
         surface_win_rate_diff = player1_stats.get('surface_win_rate', player1_stats['win_rate']) - \
                                 player2_stats.get('surface_win_rate', player2_stats['win_rate'])
@@ -274,6 +342,8 @@ class TennisPredictionModel:
         h2h_advantage = (h2h_wins / max(h2h_meetings, 1)) - 0.5 if h2h_meetings > 0 else 0
         
         age_diff = (player2_stats['age'] - player1_stats['age']) / 20
+        # Use tanh to compress extreme values and reduce their impact (matches training)
+        age_diff = np.tanh(age_diff * 0.5)  # Scale by 0.5 to reduce sensitivity
         
         surface_hard = 1 if surface == 'Hard' else 0
         surface_clay = 1 if surface == 'Clay' else 0
@@ -284,6 +354,8 @@ class TennisPredictionModel:
         strength_diff = player1_strength - player2_strength
         
         experience_diff = (player1_stats['age'] - player2_stats['age']) / 20
+        # Use tanh to compress extreme values and reduce their impact (matches training)
+        experience_diff = np.tanh(experience_diff * 0.5)  # Scale by 0.5 to reduce sensitivity
         
         # Create feature vector
         features = np.array([[
@@ -307,11 +379,17 @@ class TennisPredictionModel:
         proba = self.model.predict_proba(features_scaled)[0]
         prediction = self.model.predict(features_scaled)[0]
         
+        # Calculate betting odds
+        player1_odds = self.calculate_betting_odds(proba[1])
+        player2_odds = self.calculate_betting_odds(proba[0])
+        
         return {
             'player1_win_probability': proba[1],
             'player2_win_probability': proba[0],
             'predicted_winner': 'Player 1' if prediction == 1 else 'Player 2',
-            'confidence': max(proba)
+            'confidence': max(proba),
+            'player1_odds': player1_odds,
+            'player2_odds': player2_odds
         }
     
     def save_model(self, filepath='tennis_model.pkl'):
@@ -386,6 +464,9 @@ def main():
     print(f"Player 2 Win Probability: {result['player2_win_probability']:.2%}")
     print(f"Predicted Winner: {result['predicted_winner']}")
     print(f"Confidence: {result['confidence']:.2%}")
+    print(f"\nBetting Odds:")
+    print(f"  Player 1: Decimal {result['player1_odds']['decimal']:.2f} | American {result['player1_odds']['american']:+d} | Fractional {result['player1_odds']['fractional']}")
+    print(f"  Player 2: Decimal {result['player2_odds']['decimal']:.2f} | American {result['player2_odds']['american']:+d} | Fractional {result['player2_odds']['fractional']}")
     
     # Example 2: Close match
     print("\nExample 2: Two top 20 players (Clay court)")
@@ -411,6 +492,9 @@ def main():
     print(f"Player 2 Win Probability: {result['player2_win_probability']:.2%}")
     print(f"Predicted Winner: {result['predicted_winner']}")
     print(f"Confidence: {result['confidence']:.2%}")
+    print(f"\nBetting Odds:")
+    print(f"  Player 1: Decimal {result['player1_odds']['decimal']:.2f} | American {result['player1_odds']['american']:+d} | Fractional {result['player1_odds']['fractional']}")
+    print(f"  Player 2: Decimal {result['player2_odds']['decimal']:.2f} | American {result['player2_odds']['american']:+d} | Fractional {result['player2_odds']['fractional']}")
     
     print("\n" + "=" * 60)
     print("Model training complete!")
@@ -419,5 +503,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 

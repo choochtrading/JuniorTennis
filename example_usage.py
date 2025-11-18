@@ -44,6 +44,9 @@ def example_predictions():
     print(f"Top Player Win Probability: {result['player1_win_probability']:.1%}")
     print(f"Underdog Win Probability: {result['player2_win_probability']:.1%}")
     print(f"Predicted Winner: {result['predicted_winner']}")
+    print(f"\nBetting Odds:")
+    print(f"  Top Player:    Decimal {result['player1_odds']['decimal']:.2f} | American {result['player1_odds']['american']:+d} | Fractional {result['player1_odds']['fractional']}")
+    print(f"  Underdog:      Decimal {result['player2_odds']['decimal']:.2f} | American {result['player2_odds']['american']:+d} | Fractional {result['player2_odds']['fractional']}")
     
     # Scenario 2: Close match between top players
     print("\n[Scenario 2] Two Top 10 players (Clay Court)")
@@ -72,6 +75,9 @@ def example_predictions():
     print(f"Player 2 Win Probability: {result['player2_win_probability']:.1%}")
     print(f"Predicted Winner: {result['predicted_winner']}")
     print(f"Confidence: {result['confidence']:.1%}")
+    print(f"\nBetting Odds:")
+    print(f"  Player 1:      Decimal {result['player1_odds']['decimal']:.2f} | American {result['player1_odds']['american']:+d} | Fractional {result['player1_odds']['fractional']}")
+    print(f"  Player 2:      Decimal {result['player2_odds']['decimal']:.2f} | American {result['player2_odds']['american']:+d} | Fractional {result['player2_odds']['fractional']}")
     
     # Scenario 3: Grass court specialist
     print("\n[Scenario 3] Grass Court Specialist vs All-Court Player (Grass)")
@@ -95,6 +101,9 @@ def example_predictions():
     print(f"Grass Specialist Win Probability: {result['player1_win_probability']:.1%}")
     print(f"All-Court Player Win Probability: {result['player2_win_probability']:.1%}")
     print(f"Predicted Winner: {result['predicted_winner']}")
+    print(f"\nBetting Odds:")
+    print(f"  Grass Specialist: Decimal {result['player1_odds']['decimal']:.2f} | American {result['player1_odds']['american']:+d} | Fractional {result['player1_odds']['fractional']}")
+    print(f"  All-Court Player: Decimal {result['player2_odds']['decimal']:.2f} | American {result['player2_odds']['american']:+d} | Fractional {result['player2_odds']['fractional']}")
     
     # Scenario 4: Young rising star vs veteran
     print("\n[Scenario 4] Young Rising Star vs Experienced Veteran (Hard Court)")
@@ -118,6 +127,9 @@ def example_predictions():
     print(f"Rising Star Win Probability: {result['player1_win_probability']:.1%}")
     print(f"Veteran Win Probability: {result['player2_win_probability']:.1%}")
     print(f"Predicted Winner: {result['predicted_winner']}")
+    print(f"\nBetting Odds:")
+    print(f"  Rising Star:    Decimal {result['player1_odds']['decimal']:.2f} | American {result['player1_odds']['american']:+d} | Fractional {result['player1_odds']['fractional']}")
+    print(f"  Veteran:        Decimal {result['player2_odds']['decimal']:.2f} | American {result['player2_odds']['american']:+d} | Fractional {result['player2_odds']['fractional']}")
     
     # Scenario 5: Head-to-head advantage
     print("\n[Scenario 5] Lower Ranked Player with H2H Advantage (Clay)")
@@ -145,6 +157,9 @@ def example_predictions():
     print(f"Lower Ranked Player Win Probability: {result['player1_win_probability']:.1%}")
     print(f"Higher Ranked Player Win Probability: {result['player2_win_probability']:.1%}")
     print(f"Predicted Winner: {result['predicted_winner']}")
+    print(f"\nBetting Odds:")
+    print(f"  Lower Ranked:  Decimal {result['player1_odds']['decimal']:.2f} | American {result['player1_odds']['american']:+d} | Fractional {result['player1_odds']['fractional']}")
+    print(f"  Higher Ranked: Decimal {result['player2_odds']['decimal']:.2f} | American {result['player2_odds']['american']:+d} | Fractional {result['player2_odds']['fractional']}")
     print(f"Note: H2H advantage can overcome ranking difference!")
     
     print("\n" + "="*70)
@@ -154,5 +169,6 @@ def example_predictions():
 
 if __name__ == "__main__":
     example_predictions()
+
 
 

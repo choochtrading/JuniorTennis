@@ -9,6 +9,10 @@
 <body>
     <div class="container">
         <header>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span class="theme-toggle-icon" id="themeIcon">🌙</span>
+                <span id="themeText">Dark</span>
+            </button>
             <h1>🎾 ATP Tennis Match Predictor</h1>
             <p class="subtitle">Predict match outcomes using advanced machine learning</p>
         </header>
@@ -20,9 +24,12 @@
                 <form id="predictionForm">
                     <div class="form-group">
                         <label for="player1">Player 1:</label>
-                        <select id="player1" name="player1" required>
-                            <option value="">Select Player 1...</option>
-                        </select>
+                        <div class="player-select-wrapper">
+                            <input type="text" id="player1Search" class="player-search" placeholder="Type to search player name..." autocomplete="off">
+                            <select id="player1" name="player1" required>
+                                <option value="">Select Player 1...</option>
+                            </select>
+                        </div>
                         <div id="player1Info" class="player-info"></div>
                     </div>
 
@@ -32,9 +39,12 @@
 
                     <div class="form-group">
                         <label for="player2">Player 2:</label>
-                        <select id="player2" name="player2" required>
-                            <option value="">Select Player 2...</option>
-                        </select>
+                        <div class="player-select-wrapper">
+                            <input type="text" id="player2Search" class="player-search" placeholder="Type to search player name..." autocomplete="off">
+                            <select id="player2" name="player2" required>
+                                <option value="">Select Player 2...</option>
+                            </select>
+                        </div>
                         <div id="player2Info" class="player-info"></div>
                     </div>
 
@@ -71,6 +81,12 @@
     <script>
         let players = [];
 
+        // Store options data for search functionality
+        const playerOptionsData = {
+            player1: [],
+            player2: []
+        };
+
         // Load players on page load
         async function loadPlayers() {
             try {
@@ -79,6 +95,10 @@
                 
                 const player1Select = document.getElementById('player1');
                 const player2Select = document.getElementById('player2');
+                
+                // Store options data for search
+                playerOptionsData.player1 = [];
+                playerOptionsData.player2 = [];
                 
                 players.forEach(player => {
                     const option1 = document.createElement('option');
@@ -90,11 +110,103 @@
                     option2.value = player.name;
                     option2.textContent = `${player.name} (Rank #${player.rank})`;
                     player2Select.appendChild(option2);
+                    
+                    // Store data for search
+                    playerOptionsData.player1.push({
+                        value: player.name,
+                        text: `${player.name} (Rank #${player.rank})`
+                    });
+                    playerOptionsData.player2.push({
+                        value: player.name,
+                        text: `${player.name} (Rank #${player.rank})`
+                    });
                 });
+                
+                // Initialize search functionality
+                initializePlayerSearch('player1');
+                initializePlayerSearch('player2');
             } catch (error) {
                 console.error('Error loading players:', error);
                 alert('Error loading players. Please refresh the page.');
             }
+        }
+
+        // Initialize searchable player select
+        function initializePlayerSearch(playerPrefix) {
+            const searchInput = document.getElementById(playerPrefix + 'Search');
+            const select = document.getElementById(playerPrefix);
+            const allOptionsData = playerOptionsData[playerPrefix];
+            
+            // Filter options based on search input
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                
+                // Clear select
+                select.innerHTML = '<option value="">Select ' + (playerPrefix === 'player1' ? 'Player 1' : 'Player 2') + '...</option>';
+                
+                // If search is empty, show all options
+                if (searchTerm === '') {
+                    allOptionsData.forEach(option => {
+                        const opt = document.createElement('option');
+                        opt.value = option.value;
+                        opt.textContent = option.text;
+                        select.appendChild(opt);
+                    });
+                    select.value = '';
+                    return;
+                }
+                
+                // Filter and add matching options
+                const matchingOptions = allOptionsData.filter(option => {
+                    return option.text.toLowerCase().includes(searchTerm) || 
+                           option.value.toLowerCase().includes(searchTerm);
+                });
+                
+                matchingOptions.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option.value;
+                    opt.textContent = option.text;
+                    select.appendChild(opt);
+                });
+                
+                // If exact match found, select it
+                const exactMatch = allOptionsData.find(option => 
+                    option.text.toLowerCase() === searchTerm || 
+                    option.value.toLowerCase() === searchTerm
+                );
+                
+                if (exactMatch) {
+                    select.value = exactMatch.value;
+                    searchInput.value = exactMatch.value;
+                    select.dispatchEvent(new Event('change'));
+                } else if (matchingOptions.length === 1) {
+                    // Auto-select if only one match
+                    select.value = matchingOptions[0].value;
+                    searchInput.value = matchingOptions[0].value;
+                    select.dispatchEvent(new Event('change'));
+                } else {
+                    select.value = '';
+                }
+            });
+            
+            // Update search input when dropdown changes
+            select.addEventListener('change', (e) => {
+                if (e.target.value) {
+                    const selectedOption = allOptionsData.find(opt => opt.value === e.target.value);
+                    if (selectedOption) {
+                        searchInput.value = selectedOption.value;
+                        showPlayerInfo(e.target.value, playerPrefix + 'Info');
+                    }
+                } else {
+                    searchInput.value = '';
+                    showPlayerInfo('', playerPrefix + 'Info');
+                }
+            });
+            
+            // Clear search when clicking
+            searchInput.addEventListener('focus', () => {
+                searchInput.select();
+            });
         }
 
         // Show player info when selected
@@ -227,6 +339,46 @@
                     </div>
                     <p class="confidence">Confidence: ${confidence}%</p>
                 </div>
+                
+                <div class="betting-odds-section">
+                    <h3>📊 Predicted Betting Odds</h3>
+                    <div class="odds-container">
+                        <div class="odds-card">
+                            <div class="odds-player">${result.player1}</div>
+                            <div class="odds-values">
+                                <div class="odds-item">
+                                    <span class="odds-label">Decimal:</span>
+                                    <span class="odds-value">${result.player1_odds.decimal.toFixed(2)}</span>
+                                </div>
+                                <div class="odds-item">
+                                    <span class="odds-label">American:</span>
+                                    <span class="odds-value">${result.player1_odds.american > 0 ? '+' : ''}${result.player1_odds.american}</span>
+                                </div>
+                                <div class="odds-item">
+                                    <span class="odds-label">Fractional:</span>
+                                    <span class="odds-value">${result.player1_odds.fractional}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="odds-card">
+                            <div class="odds-player">${result.player2}</div>
+                            <div class="odds-values">
+                                <div class="odds-item">
+                                    <span class="odds-label">Decimal:</span>
+                                    <span class="odds-value">${result.player2_odds.decimal.toFixed(2)}</span>
+                                </div>
+                                <div class="odds-item">
+                                    <span class="odds-label">American:</span>
+                                    <span class="odds-value">${result.player2_odds.american > 0 ? '+' : ''}${result.player2_odds.american}</span>
+                                </div>
+                                <div class="odds-item">
+                                    <span class="odds-label">Fractional:</span>
+                                    <span class="odds-value">${result.player2_odds.fractional}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             `;
             
             resultSection.style.display = 'block';
@@ -242,9 +394,56 @@
             showPlayerInfo(e.target.value, 'player2Info');
         });
 
+        // Theme toggle functionality
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            
+            // Set initial theme
+            if (savedTheme === 'light') {
+                html.setAttribute('data-theme', 'light');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light';
+            } else {
+                html.removeAttribute('data-theme');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark';
+            }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            const currentTheme = html.getAttribute('data-theme');
+            
+            if (currentTheme === 'light') {
+                // Switch to dark
+                html.removeAttribute('data-theme');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                // Switch to light
+                html.setAttribute('data-theme', 'light');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Initialize theme on page load
+        initTheme();
+
+        // Add event listener for theme toggle button
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
         // Load players when page loads
         loadPlayers();
     </script>
 </body>
 </html>
+
 
