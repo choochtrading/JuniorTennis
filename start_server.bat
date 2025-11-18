@@ -1,3 +1,6 @@
+@echo off
 cd /d "C:\Users\flame\OneDrive\Desktop\New folder"
-start "" "http://127.0.0.1:5000"
+echo Starting ATP Tennis Prediction Server...
+echo.
 python app.py
+pause

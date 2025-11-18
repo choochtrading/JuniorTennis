@@ -33,95 +33,95 @@ class PlayerDatabase:
     def _create_default_database(self) -> Dict:
         """Create a default database with sample ATP players."""
         default_players = {
-            "Novak Djokovic": {
+            "Jannik Sinner": {
                 "rank": 1,
-                "win_rate": 0.85,
-                "hard_win_rate": 0.87,
-                "clay_win_rate": 0.82,
-                "grass_win_rate": 0.88,
-                "recent_form": 0.83,
-                "age": 37
+                "win_rate": 0.88,
+                "hard_win_rate": 0.85,
+                "clay_win_rate": 0.75,
+                "grass_win_rate": 0.80,
+                "recent_form": 0.90,
+                "age": 23
             },
             "Carlos Alcaraz": {
                 "rank": 2,
-                "win_rate": 0.80,
-                "hard_win_rate": 0.78,
-                "clay_win_rate": 0.85,
-                "grass_win_rate": 0.75,
-                "recent_form": 0.82,
+                "win_rate": 0.82,
+                "hard_win_rate": 0.80,
+                "clay_win_rate": 0.87,
+                "grass_win_rate": 0.78,
+                "recent_form": 0.85,
                 "age": 21
             },
-            "Daniil Medvedev": {
+            "Novak Djokovic": {
                 "rank": 3,
-                "win_rate": 0.78,
-                "hard_win_rate": 0.82,
-                "clay_win_rate": 0.65,
-                "grass_win_rate": 0.70,
+                "win_rate": 0.83,
+                "hard_win_rate": 0.85,
+                "clay_win_rate": 0.80,
+                "grass_win_rate": 0.86,
                 "recent_form": 0.80,
-                "age": 28
+                "age": 37
             },
-            "Jannik Sinner": {
+            "Daniil Medvedev": {
                 "rank": 4,
-                "win_rate": 0.77,
-                "hard_win_rate": 0.80,
-                "clay_win_rate": 0.72,
-                "grass_win_rate": 0.75,
-                "recent_form": 0.85,
-                "age": 22
+                "win_rate": 0.79,
+                "hard_win_rate": 0.83,
+                "clay_win_rate": 0.66,
+                "grass_win_rate": 0.72,
+                "recent_form": 0.81,
+                "age": 28
             },
             "Andrey Rublev": {
                 "rank": 5,
-                "win_rate": 0.72,
-                "hard_win_rate": 0.70,
-                "clay_win_rate": 0.75,
-                "grass_win_rate": 0.68,
-                "recent_form": 0.70,
-                "age": 26
-            },
-            "Stefanos Tsitsipas": {
-                "rank": 6,
-                "win_rate": 0.71,
-                "hard_win_rate": 0.68,
-                "clay_win_rate": 0.78,
-                "grass_win_rate": 0.65,
-                "recent_form": 0.72,
-                "age": 25
-            },
-            "Casper Ruud": {
-                "rank": 7,
-                "win_rate": 0.70,
-                "hard_win_rate": 0.65,
-                "clay_win_rate": 0.80,
-                "grass_win_rate": 0.60,
-                "recent_form": 0.68,
-                "age": 25
-            },
-            "Alexander Zverev": {
-                "rank": 8,
-                "win_rate": 0.69,
-                "hard_win_rate": 0.72,
-                "clay_win_rate": 0.70,
-                "grass_win_rate": 0.65,
-                "recent_form": 0.75,
+                "win_rate": 0.73,
+                "hard_win_rate": 0.71,
+                "clay_win_rate": 0.76,
+                "grass_win_rate": 0.69,
+                "recent_form": 0.71,
                 "age": 27
             },
-            "Holger Rune": {
-                "rank": 9,
-                "win_rate": 0.68,
-                "hard_win_rate": 0.70,
+            "Alexander Zverev": {
+                "rank": 6,
+                "win_rate": 0.71,
+                "hard_win_rate": 0.74,
                 "clay_win_rate": 0.72,
-                "grass_win_rate": 0.65,
-                "recent_form": 0.65,
+                "grass_win_rate": 0.67,
+                "recent_form": 0.76,
+                "age": 27
+            },
+            "Stefanos Tsitsipas": {
+                "rank": 7,
+                "win_rate": 0.72,
+                "hard_win_rate": 0.69,
+                "clay_win_rate": 0.79,
+                "grass_win_rate": 0.66,
+                "recent_form": 0.73,
+                "age": 26
+            },
+            "Holger Rune": {
+                "rank": 8,
+                "win_rate": 0.69,
+                "hard_win_rate": 0.71,
+                "clay_win_rate": 0.73,
+                "grass_win_rate": 0.66,
+                "recent_form": 0.66,
                 "age": 21
+            },
+            "Casper Ruud": {
+                "rank": 9,
+                "win_rate": 0.71,
+                "hard_win_rate": 0.66,
+                "clay_win_rate": 0.81,
+                "grass_win_rate": 0.61,
+                "recent_form": 0.69,
+                "age": 25
             },
             "Taylor Fritz": {
                 "rank": 10,
-                "win_rate": 0.67,
-                "hard_win_rate": 0.72,
-                "clay_win_rate": 0.58,
-                "grass_win_rate": 0.70,
-                "recent_form": 0.70,
-                "age": 26
+                "win_rate": 0.68,
+                "hard_win_rate": 0.73,
+                "clay_win_rate": 0.59,
+                "grass_win_rate": 0.71,
+                "recent_form": 0.71,
+                "age": 27
             },
             "Grigor Dimitrov": {
                 "rank": 11,
@@ -645,14 +645,14 @@ class PlayerDatabase:
                 "recent_form": 0.10,
                 "age": 27
             },
-            "Hugo Gaston": {
+            "Matteo Arnaldi": {
                 "rank": 69,
                 "win_rate": 0.08,
                 "hard_win_rate": 0.16,
-                "clay_win_rate": 0.15,
-                "grass_win_rate": 0.09,
+                "clay_win_rate": 0.14,
+                "grass_win_rate": 0.10,
                 "recent_form": 0.09,
-                "age": 24
+                "age": 23
             },
             "Corentin Moutet": {
                 "rank": 70,
@@ -852,44 +852,71 @@ class PlayerDatabase:
                 "recent_form": 0.01,
                 "age": 30
             },
-            "Diego Schwartzman": {
+            "Quentin Halys": {
                 "rank": 92,
+                "win_rate": 0.01,
+                "hard_win_rate": 0.14,
+                "clay_win_rate": 0.11,
+                "grass_win_rate": 0.10,
+                "recent_form": 0.01,
+                "age": 28
+            },
+            "Roberto Bautista Agut": {
+                "rank": 93,
                 "win_rate": 0.01,
                 "hard_win_rate": 0.13,
                 "clay_win_rate": 0.12,
-                "grass_win_rate": 0.09,
-                "recent_form": 0.01,
-                "age": 32
-            },
-            "Botic van de Zandschulp": {
-                "rank": 93,
-                "win_rate": 0.01,
-                "hard_win_rate": 0.14,
-                "clay_win_rate": 0.10,
                 "grass_win_rate": 0.10,
                 "recent_form": 0.01,
-                "age": 29
+                "age": 36
             },
-            "Arthur Rinderknech": {
+            "Shintaro Mochizuki": {
                 "rank": 94,
                 "win_rate": 0.01,
                 "hard_win_rate": 0.15,
-                "clay_win_rate": 0.09,
+                "clay_win_rate": 0.10,
                 "grass_win_rate": 0.11,
                 "recent_form": 0.01,
-                "age": 29
+                "age": 21
             },
-            "Dominik Koepfer": {
+            "Pedro Martinez": {
                 "rank": 95,
+                "win_rate": 0.01,
+                "hard_win_rate": 0.12,
+                "clay_win_rate": 0.13,
+                "grass_win_rate": 0.09,
+                "recent_form": 0.01,
+                "age": 27
+            },
+            "Benjamin Bonzi": {
+                "rank": 96,
+                "win_rate": 0.01,
+                "hard_win_rate": 0.13,
+                "clay_win_rate": 0.12,
+                "grass_win_rate": 0.10,
+                "recent_form": 0.01,
+                "age": 28
+            },
+            "Alexander Shevchenko": {
+                "rank": 97,
                 "win_rate": 0.01,
                 "hard_win_rate": 0.14,
                 "clay_win_rate": 0.11,
                 "grass_win_rate": 0.09,
                 "recent_form": 0.01,
-                "age": 30
+                "age": 24
             },
-            "Juan Pablo Varillas": {
-                "rank": 96,
+            "Hugo Gaston": {
+                "rank": 98,
+                "win_rate": 0.01,
+                "hard_win_rate": 0.13,
+                "clay_win_rate": 0.12,
+                "grass_win_rate": 0.10,
+                "recent_form": 0.01,
+                "age": 24
+            },
+            "Laslo Djere": {
+                "rank": 99,
                 "win_rate": 0.01,
                 "hard_win_rate": 0.11,
                 "clay_win_rate": 0.13,
@@ -897,41 +924,14 @@ class PlayerDatabase:
                 "recent_form": 0.01,
                 "age": 29
             },
-            "Yosuke Watanuki": {
-                "rank": 97,
-                "win_rate": 0.01,
-                "hard_win_rate": 0.16,
-                "clay_win_rate": 0.08,
-                "grass_win_rate": 0.10,
-                "recent_form": 0.01,
-                "age": 26
-            },
-            "Matteo Arnaldi": {
-                "rank": 98,
-                "win_rate": 0.01,
-                "hard_win_rate": 0.13,
-                "clay_win_rate": 0.12,
-                "grass_win_rate": 0.09,
-                "recent_form": 0.01,
-                "age": 23
-            },
-            "Brandon Nakashima": {
-                "rank": 99,
-                "win_rate": 0.01,
-                "hard_win_rate": 0.15,
-                "clay_win_rate": 0.09,
-                "grass_win_rate": 0.10,
-                "recent_form": 0.01,
-                "age": 23
-            },
-            "J.J. Wolf": {
+            "Tristan Schoolkate": {
                 "rank": 100,
                 "win_rate": 0.01,
                 "hard_win_rate": 0.14,
                 "clay_win_rate": 0.10,
                 "grass_win_rate": 0.11,
                 "recent_form": 0.01,
-                "age": 25
+                "age": 24
             }
         }
         return default_players
@@ -961,6 +961,138 @@ class PlayerDatabase:
             self.save_players()
         else:
             raise ValueError(f"Player {name} not found in database")
+    
+    def update_rankings(self, rankings_data: List[Dict]) -> Dict:
+        """
+        Update player rankings from fetched ATP rankings data.
+        Only keeps the top 100 players and removes all others.
+        
+        Args:
+            rankings_data: List of dicts with 'rank', 'name', and optionally 'age', 'points'
+            
+        Returns:
+            Dict with update statistics
+        """
+        # Ensure we only work with top 100
+        rankings_data = [p for p in rankings_data if p.get('rank', 999) <= 100][:100]
+        
+        updated = 0
+        added = 0
+        removed = 0
+        
+        # Track which players are in the new top 100
+        current_ranked_names = {p.get('name', '').lower() for p in rankings_data}
+        
+        # Create a new players dictionary with only top 100
+        new_players = {}
+        
+        for player_data in rankings_data:
+            rank = player_data.get('rank')
+            name = player_data.get('name')
+            
+            if not name or not rank or rank > 100:
+                continue
+            
+            # Try to find player by exact name match
+            if name in self.players:
+                # Keep existing player stats, just update rank
+                stats = self.players[name].copy()
+                stats['rank'] = rank
+                # Update age if provided and not None, otherwise keep existing or set default
+                if 'age' in player_data and player_data['age'] is not None:
+                    stats['age'] = player_data['age']
+                elif stats.get('age') is None:
+                    stats['age'] = 25  # Default age if missing
+                new_players[name] = stats
+                updated += 1
+            else:
+                # Try to find by similar name (case-insensitive, handle variations)
+                found = False
+                for existing_name in self.players.keys():
+                    if name.lower() == existing_name.lower():
+                        # Update with correct name
+                        stats = self.players[existing_name].copy()
+                        stats['rank'] = rank
+                        # Update age if provided and not None, otherwise keep existing or set default
+                        if 'age' in player_data and player_data['age'] is not None:
+                            stats['age'] = player_data['age']
+                        elif stats.get('age') is None:
+                            stats['age'] = 25  # Default age if missing
+                        new_players[name] = stats
+                        updated += 1
+                        found = True
+                        break
+                
+                if not found:
+                    # Add new player with default stats based on rank
+                    # Ensure age is not None
+                    player_age = player_data.get('age')
+                    if player_age is None:
+                        player_age = 25  # Default age
+                    
+                    new_players[name] = {
+                        "rank": rank,
+                        "win_rate": max(0.01, 1.0 - (rank - 1) * 0.01),
+                        "hard_win_rate": max(0.10, 0.70 - (rank - 1) * 0.005),
+                        "clay_win_rate": max(0.10, 0.65 - (rank - 1) * 0.005),
+                        "grass_win_rate": max(0.10, 0.65 - (rank - 1) * 0.005),
+                        "recent_form": max(0.01, 0.70 - (rank - 1) * 0.01),
+                        "age": player_age
+                    }
+                    added += 1
+        
+        # Count removed players (those not in top 100)
+        removed = len(self.players) - len(new_players)
+        
+        # Replace the entire players dictionary with only top 100
+        self.players = new_players
+        
+        self.save_players()
+        
+        return {
+            'updated': updated,
+            'added': added,
+            'removed': removed,
+            'total_players': len(self.players),
+            'rankings_fetched': len(rankings_data)
+        }
+    
+    def cleanup_rankings(self) -> Dict:
+        """
+        Remove all players not in the top 100 (rank > 100 or rank == 999).
+        Also fixes any None age values.
+        
+        Returns:
+            Dict with cleanup statistics
+        """
+        initial_count = len(self.players)
+        age_fixed = 0
+        
+        # Fix None ages and remove invalid rankings
+        players_to_remove = []
+        for name, stats in self.players.items():
+            # Fix None age values
+            if stats.get('age') is None:
+                stats['age'] = 25  # Default age
+                age_fixed += 1
+            
+            # Mark for removal if rank is invalid
+            if stats.get('rank', 999) > 100 or stats.get('rank', 999) == 999:
+                players_to_remove.append(name)
+        
+        # Remove invalid players
+        for name in players_to_remove:
+            del self.players[name]
+        
+        removed = len(players_to_remove)
+        self.save_players()
+        
+        return {
+            'removed': removed,
+            'age_fixed': age_fixed,
+            'remaining': len(self.players),
+            'initial_count': initial_count
+        }
     
     def get_head_to_head(self, player1: str, player2: str) -> Dict:
         """Get head-to-head record between two players."""

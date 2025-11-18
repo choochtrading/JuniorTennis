@@ -329,19 +329,36 @@ class TennisPredictionModel:
         if not self.is_trained:
             raise ValueError("Model must be trained before making predictions!")
         
+        # Helper function to safely get stat with default
+        def safe_get(stats, key, default):
+            value = stats.get(key)
+            return default if value is None else value
+        
+        # Safely extract all stats with defaults
+        p1_rank = safe_get(player1_stats, 'rank', 100)
+        p1_win_rate = safe_get(player1_stats, 'win_rate', 0.5)
+        p1_surface_win_rate = safe_get(player1_stats, 'surface_win_rate', p1_win_rate)
+        p1_recent_form = safe_get(player1_stats, 'recent_form', 0.5)
+        p1_age = safe_get(player1_stats, 'age', 25)
+        
+        p2_rank = safe_get(player2_stats, 'rank', 100)
+        p2_win_rate = safe_get(player2_stats, 'win_rate', 0.5)
+        p2_surface_win_rate = safe_get(player2_stats, 'surface_win_rate', p2_win_rate)
+        p2_recent_form = safe_get(player2_stats, 'recent_form', 0.5)
+        p2_age = safe_get(player2_stats, 'age', 25)
+        
         # Calculate features
         # Use inverse rank to give more weight to small rank differences at the top
-        rank_diff_normalized = (1.0 / player1_stats['rank'] - 1.0 / player2_stats['rank']) * 10
-        win_rate_diff = player1_stats['win_rate'] - player2_stats['win_rate']
-        surface_win_rate_diff = player1_stats.get('surface_win_rate', player1_stats['win_rate']) - \
-                                player2_stats.get('surface_win_rate', player2_stats['win_rate'])
-        form_diff = player1_stats['recent_form'] - player2_stats['recent_form']
+        rank_diff_normalized = (1.0 / max(p1_rank, 1) - 1.0 / max(p2_rank, 1)) * 10
+        win_rate_diff = p1_win_rate - p2_win_rate
+        surface_win_rate_diff = p1_surface_win_rate - p2_surface_win_rate
+        form_diff = p1_recent_form - p2_recent_form
         
-        h2h_meetings = player1_stats.get('h2h_meetings', 0)
-        h2h_wins = player1_stats.get('h2h_wins', 0)
+        h2h_meetings = safe_get(player1_stats, 'h2h_meetings', 0)
+        h2h_wins = safe_get(player1_stats, 'h2h_wins', 0)
         h2h_advantage = (h2h_wins / max(h2h_meetings, 1)) - 0.5 if h2h_meetings > 0 else 0
         
-        age_diff = (player2_stats['age'] - player1_stats['age']) / 20
+        age_diff = (p2_age - p1_age) / 20
         # Use tanh to compress extreme values and reduce their impact (matches training)
         age_diff = np.tanh(age_diff * 0.5)  # Scale by 0.5 to reduce sensitivity
         
@@ -349,11 +366,11 @@ class TennisPredictionModel:
         surface_clay = 1 if surface == 'Clay' else 0
         surface_grass = 1 if surface == 'Grass' else 0
         
-        player1_strength = (500 - player1_stats['rank']) / 500 + player1_stats['win_rate'] + player1_stats['recent_form']
-        player2_strength = (500 - player2_stats['rank']) / 500 + player2_stats['win_rate'] + player2_stats['recent_form']
+        player1_strength = (500 - p1_rank) / 500 + p1_win_rate + p1_recent_form
+        player2_strength = (500 - p2_rank) / 500 + p2_win_rate + p2_recent_form
         strength_diff = player1_strength - player2_strength
         
-        experience_diff = (player1_stats['age'] - player2_stats['age']) / 20
+        experience_diff = (p1_age - p2_age) / 20
         # Use tanh to compress extreme values and reduce their impact (matches training)
         experience_diff = np.tanh(experience_diff * 0.5)  # Scale by 0.5 to reduce sensitivity
         
@@ -370,8 +387,8 @@ class TennisPredictionModel:
             surface_grass,
             strength_diff,
             experience_diff,
-            player1_stats['rank'],
-            player2_stats['rank']
+            p1_rank,
+            p2_rank
         ]])
         
         # Scale and predict

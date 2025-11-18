@@ -221,12 +221,13 @@
                 const player = await response.json();
                 
                 const infoDiv = document.getElementById(elementId);
+                const ageDisplay = player.age !== null && player.age !== undefined ? player.age : 'N/A';
                 infoDiv.innerHTML = `
                     <div class="player-card">
                         <strong>${player.name}</strong>
                         <div class="player-stats">
                             <span>Rank: #${player.rank}</span>
-                            <span>Age: ${player.age}</span>
+                            <span>Age: ${ageDisplay}</span>
                             <span>Win Rate: ${(player.win_rate * 100).toFixed(1)}%</span>
                             <span>Recent Form: ${(player.recent_form * 100).toFixed(1)}%</span>
                         </div>
