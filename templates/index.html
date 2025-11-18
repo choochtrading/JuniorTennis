@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATP Tennis Match Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎾 ATP Tennis Match Predictor</h1>
+            <p class="subtitle">Predict match outcomes using advanced machine learning</p>
+        </header>
+
+        <main>
+            <div class="prediction-section">
+                <h2>Make a Prediction</h2>
+                
+                <form id="predictionForm">
+                    <div class="form-group">
+                        <label for="player1">Player 1:</label>
+                        <select id="player1" name="player1" required>
+                            <option value="">Select Player 1...</option>
+                        </select>
+                        <div id="player1Info" class="player-info"></div>
+                    </div>
+
+                    <div class="vs-divider">
+                        <span>VS</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="player2">Player 2:</label>
+                        <select id="player2" name="player2" required>
+                            <option value="">Select Player 2...</option>
+                        </select>
+                        <div id="player2Info" class="player-info"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="surface">Court Surface:</label>
+                        <div class="surface-buttons">
+                            <input type="radio" id="hard" name="surface" value="Hard" checked>
+                            <label for="hard" class="surface-btn">Hard</label>
+                            
+                            <input type="radio" id="clay" name="surface" value="Clay">
+                            <label for="clay" class="surface-btn">Clay</label>
+                            
+                            <input type="radio" id="grass" name="surface" value="Grass">
+                            <label for="grass" class="surface-btn">Grass</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="predict-btn">Predict Match</button>
+                </form>
+            </div>
+
+            <div id="resultSection" class="result-section" style="display: none;">
+                <h2>Prediction Results</h2>
+                <div id="resultContent"></div>
+            </div>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing match...</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let players = [];
+
+        // Load players on page load
+        async function loadPlayers() {
+            try {
+                const response = await fetch('/api/players');
+                players = await response.json();
+                
+                const player1Select = document.getElementById('player1');
+                const player2Select = document.getElementById('player2');
+                
+                players.forEach(player => {
+                    const option1 = document.createElement('option');
+                    option1.value = player.name;
+                    option1.textContent = `${player.name} (Rank #${player.rank})`;
+                    player1Select.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = player.name;
+                    option2.textContent = `${player.name} (Rank #${player.rank})`;
+                    player2Select.appendChild(option2);
+                });
+            } catch (error) {
+                console.error('Error loading players:', error);
+                alert('Error loading players. Please refresh the page.');
+            }
+        }
+
+        // Show player info when selected
+        async function showPlayerInfo(playerName, elementId) {
+            if (!playerName) {
+                document.getElementById(elementId).innerHTML = '';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/player/${encodeURIComponent(playerName)}`);
+                const player = await response.json();
+                
+                const infoDiv = document.getElementById(elementId);
+                infoDiv.innerHTML = `
+                    <div class="player-card">
+                        <strong>${player.name}</strong>
+                        <div class="player-stats">
+                            <span>Rank: #${player.rank}</span>
+                            <span>Age: ${player.age}</span>
+                            <span>Win Rate: ${(player.win_rate * 100).toFixed(1)}%</span>
+                            <span>Recent Form: ${(player.recent_form * 100).toFixed(1)}%</span>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading player info:', error);
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const player1 = document.getElementById('player1').value;
+            const player2 = document.getElementById('player2').value;
+            const surface = document.querySelector('input[name="surface"]:checked').value;
+            
+            if (player1 === player2) {
+                alert('Please select two different players!');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        player1: player1,
+                        player2: player2,
+                        surface: surface
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayResult(result);
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error making prediction:', error);
+                alert('Error making prediction. Please try again.');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+
+        // Display prediction results
+        function displayResult(result) {
+            const resultSection = document.getElementById('resultSection');
+            const resultContent = document.getElementById('resultContent');
+            
+            const player1Prob = (result.player1_win_probability * 100).toFixed(1);
+            const player2Prob = (result.player2_win_probability * 100).toFixed(1);
+            const confidence = (result.confidence * 100).toFixed(1);
+            
+            const winner = result.predicted_winner === 'Player 1' ? result.player1 : result.player2;
+            const winnerProb = result.predicted_winner === 'Player 1' ? player1Prob : player2Prob;
+            
+            let h2hHtml = '';
+            if (result.h2h && result.h2h.meetings > 0) {
+                const p1Wins = result.h2h.wins;
+                const p2Wins = result.h2h.meetings - result.h2h.wins;
+                h2hHtml = `
+                    <div class="h2h-info">
+                        <h3>Head-to-Head</h3>
+                        <p><strong>${result.player1}</strong> leads <strong>${p1Wins}-${p2Wins}</strong> (${result.h2h.meetings} meetings)</p>
+                    </div>
+                `;
+            }
+            
+            resultContent.innerHTML = `
+                <div class="match-header">
+                    <h3>${result.player1} vs ${result.player2}</h3>
+                    <p class="surface-badge surface-${result.surface.toLowerCase()}">${result.surface} Court</p>
+                </div>
+                
+                ${h2hHtml}
+                
+                <div class="prediction-results">
+                    <div class="player-result ${result.predicted_winner === 'Player 1' ? 'winner' : ''}">
+                        <div class="player-name">${result.player1}</div>
+                        <div class="probability-bar">
+                            <div class="bar-fill" style="width: ${player1Prob}%"></div>
+                            <span class="probability-text">${player1Prob}%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="player-result ${result.predicted_winner === 'Player 2' ? 'winner' : ''}">
+                        <div class="player-name">${result.player2}</div>
+                        <div class="probability-bar">
+                            <div class="bar-fill" style="width: ${player2Prob}%"></div>
+                            <span class="probability-text">${player2Prob}%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="prediction-summary">
+                    <div class="winner-badge">
+                        <span class="trophy">🏆</span>
+                        <strong>Predicted Winner: ${winner}</strong>
+                    </div>
+                    <p class="confidence">Confidence: ${confidence}%</p>
+                </div>
+            `;
+            
+            resultSection.style.display = 'block';
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Event listeners for player selection
+        document.getElementById('player1').addEventListener('change', (e) => {
+            showPlayerInfo(e.target.value, 'player1Info');
+        });
+
+        document.getElementById('player2').addEventListener('change', (e) => {
+            showPlayerInfo(e.target.value, 'player2Info');
+        });
+
+        // Load players when page loads
+        loadPlayers();
+    </script>
+</body>
+</html>
+
